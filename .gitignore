@@ -1,0 +1,16 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# n8n
+node_modules/
+.n8n/
+*.log
+
+# Environment
+.env
+.env.local
+
+# Temp
+tmp/
+temp/

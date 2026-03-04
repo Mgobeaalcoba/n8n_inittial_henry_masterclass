@@ -1,0 +1,836 @@
+## **Masterclass: AI Automation para Henry**
+
+## **Título Sugerido**
+
+**"Tu Primer Robot con IA: Automatización de Procesos para No-Programadores"**
+
+## **Objetivo de la Sesión**
+
+Demostrar la potencia de la automatización con IA mediante la construcción en vivo de un flujo de trabajo inteligente, robusto y escalable, eliminando la barrera del código para los nuevos aspirantes a la carrera de AI Automation.
+
+## **Público Objetivo**
+
+* Interesados en tecnología y eficiencia operativa.  
+* Perfiles sin experiencia previa en programación que buscan una salida laboral innovadora.  
+* Emprendedores y profesionales que desean optimizar tareas repetitivas.
+
+## ---
+
+**Agenda y Caso Práctico**
+
+La Masterclass se centrará en la resolución de un problema real de negocio: **La gestión inteligente y resiliente de feedback o leads.**
+
+#### **1\. Introducción a los Conceptos Base (10 min)**
+
+* **¿Qué es n8n?** El centro neurálgico de nuestras automatizaciones.  
+* **Anatomía de un flujo:** Explicación técnica y visual del concepto de **Trigger** (Disparador) y **Nodos** (Acciones).
+
+#### **2\. Desarrollo en Vivo: El Robot de Análisis de Sentimiento (35 min)**
+
+Se construirá paso a paso un ecosistema que conecte las siguientes herramientas:
+
+1. **Captación (Trigger):** Entrada de datos vía Formulario (Typeform/Google Forms).  
+2. **Cerebro (AI Node):** Conexión con OpenAI para analizar la intención y el sentimiento del mensaje recibido.  
+3. **Acción Inmediata:** Notificación inteligente en Slack basada en el análisis de la IA.  
+4. **Base de Datos Pro:** Registro estructurado de la información en Airtable para seguimiento comercial o de soporte.
+
+#### **3\. Implementación de Resiliencia (Manejo de Errores)**
+
+Para demostrar un nivel profesional de automatización, se incluirá:
+
+* **Flujo de Fallback:** Configuración de un nodo de error. Si la IA falla (por timeout o límites de cuota), el sistema no se detiene.  
+* **Observabilidad:** Registro automático del error en una hoja de Google Sheets para posterior auditoría y mejora del prompt.
+
+## ---
+
+**Valor Agregado para el Alumno (Conversion Hook)**
+
+* **Demostración de Robustez:** Se enseña que automatizar no es solo unir apps, sino prever fallos, una habilidad clave del **AI Automation Engineer**.  
+* **Escalabilidad:** El alumno entenderá cómo esta misma base sirve para procesos mucho más complejos que se dictan en la carrera completa.
+
+---
+
+## **Automation JSON:** 
+
+```json
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.data.fields[4].value }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Eres un experto en análisis de sentimiento. Analiza el mensaje del cliente y determina: 1) El sentimiento general (positivo, neutral, negativo, urgente), 2) La intención principal (consulta, queja, sugerencia, elogio, soporte_urgente), 3) Un nivel de confianza (0-100) en tu análisis, 4) Palabras clave identificadas, 5) Una respuesta sugerida breve.\n\nTu respuesta debe ser en formato JSON siempre con el siguiente Schema: \n{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"sentimiento\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"enum\": [\"positivo\", \"neutral\", \"negativo\", \"urgente\"]\n\t\t},\n\t\t\"intencion\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"enum\": [\"consulta\", \"queja\", \"sugerencia\", \"elogio\", \"soporte_urgente\"]\n\t\t},\n\t\t\"confianza\": {\n\t\t\t\"type\": \"number\",\n\t\t\t\"minimum\": 0,\n\t\t\t\"maximum\": 100\n\t\t},\n\t\t\"palabras_clave\": {\n\t\t\t\"type\": \"array\",\n\t\t\t\"items\": {\n\t\t\t\t\"type\": \"string\"\n\t\t\t}\n\t\t},\n\t\t\"respuesta_sugerida\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t},\n\t\"required\": [\"sentimiento\", \"intencion\", \"confianza\", \"palabras_clave\", \"respuesta_sugerida\"]\n}"
+        }
+      },
+      "id": "456fbfcc-2e06-4263-9f27-56d7e7c99efe",
+      "name": "Análisis de Sentimiento IA",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        672
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"sentimiento\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"enum\": [\"positivo\", \"neutral\", \"negativo\", \"urgente\"]\n\t\t},\n\t\t\"intencion\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"enum\": [\"consulta\", \"queja\", \"sugerencia\", \"elogio\", \"soporte_urgente\"]\n\t\t},\n\t\t\"confianza\": {\n\t\t\t\"type\": \"number\",\n\t\t\t\"minimum\": 0,\n\t\t\t\"maximum\": 100\n\t\t},\n\t\t\"palabras_clave\": {\n\t\t\t\"type\": \"array\",\n\t\t\t\"items\": {\n\t\t\t\t\"type\": \"string\"\n\t\t\t}\n\t\t},\n\t\t\"respuesta_sugerida\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t},\n\t\"required\": [\"sentimiento\", \"intencion\", \"confianza\", \"palabras_clave\", \"respuesta_sugerida\"]\n}",
+        "autoFix": true
+      },
+      "id": "029a96c4-18eb-44be-8c95-dcfec90cf776",
+      "name": "Estructura JSON Sentimiento",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        544,
+        896
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "nombre_cliente",
+              "value": "={{ $('Webhook').item.json.body.data.fields[0].value }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "email_cliente",
+              "value": "={{ $('Webhook').item.json.body.data.fields[2].value }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "mensaje_original",
+              "value": "={{ $('Webhook').item.json.body.data.fields[4].value }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "sentimiento",
+              "value": "={{ $json.output.sentimiento }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "intencion",
+              "value": "={{ $json.output.intencion }}",
+              "type": "string"
+            },
+            {
+              "id": "id-6",
+              "name": "confianza",
+              "value": "={{ $json.output.confianza }}",
+              "type": "number"
+            },
+            {
+              "id": "id-7",
+              "name": "palabras_clave",
+              "value": "={{ $json.output.palabras_clave.join(', ') }}",
+              "type": "string"
+            },
+            {
+              "id": "id-8",
+              "name": "respuesta_sugerida",
+              "value": "={{ $json.output.respuesta_sugerida }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ecd0c9b5-ff1d-498c-8675-9464b6b62ea3",
+      "name": "Preparar Datos para Slack",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AJG4SGU5C",
+          "mode": "id"
+        },
+        "text": "={{ $json.sentimiento === \"positivo\" ? \"✅\" : $json.sentimiento === \"negativo\" ? \"⚠️\" : $json.sentimiento === \"urgente\" ? \"🚨\" : \"ℹ️\" }} *Nuevo Feedback Recibido*\n\n*Cliente:* {{ $json.nombre_cliente }} ({{ $json.email_cliente }})\n*Sentimiento:* {{ $json.sentimiento.toUpperCase() }}\n*Intención:* {{ $json.intencion }}\n*Confianza:* {{ $json.confianza }}%\n\n*Mensaje:*\n{{ $json.mensaje_original }}\n\n*Palabras Clave:* {{ $json.palabras_clave }}\n\n*Respuesta Sugerida:*\n{{ $json.respuesta_sugerida }}",
+        "otherOptions": {}
+      },
+      "id": "dc6a42ea-d3cd-4830-afdc-dabb51512e74",
+      "name": "Notificación Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1136,
+        480
+      ],
+      "webhookId": "82baf2a2-3941-4dce-bc47-61f8e2703871",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "o26gZ4Sx9UhiiEVT",
+          "name": "Slack Henry Dummy"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "Nombre",
+              "value": "={{ $('Webhook').item.json.body.data.fields[0].value }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "Email",
+              "value": "={{ $('Webhook').item.json.body.data.fields[2].value }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "Mensaje",
+              "value": "={{ $('Webhook').item.json.body.data.fields[4].value }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "Sentimiento",
+              "value": "={{ $json.output.sentimiento }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "Intencion",
+              "value": "={{ $json.output.intencion }}",
+              "type": "string"
+            },
+            {
+              "id": "id-6",
+              "name": "Confianza",
+              "value": "={{ $json.output.confianza }}",
+              "type": "number"
+            },
+            {
+              "id": "id-7",
+              "name": "Palabras_Clave",
+              "value": "={{ $json.output.palabras_clave.join(', ') }}",
+              "type": "string"
+            },
+            {
+              "id": "id-8",
+              "name": "Respuesta_Sugerida",
+              "value": "={{ $json.output.respuesta_sugerida }}",
+              "type": "string"
+            },
+            {
+              "id": "id-9",
+              "name": "Fecha",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1e00526a-0861-407b-972e-e155e46eba61",
+      "name": "Preparar Datos para Airtable",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appAy221d2TVGtdHU",
+          "mode": "list",
+          "cachedResultName": "n8n automation",
+          "cachedResultUrl": "https://airtable.com/appAy221d2TVGtdHU"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblTEWENK7RqRlHlA",
+          "mode": "list",
+          "cachedResultName": "Form Success",
+          "cachedResultUrl": "https://airtable.com/appAy221d2TVGtdHU/tblTEWENK7RqRlHlA"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nombre_cliente": "={{ $json.Nombre }}",
+            "email_cliente": "={{ $json.Email }}",
+            "mensaje_original": "={{ $json.Mensaje }}",
+            "sentimiento": "={{ $json.Sentimiento.toTitleCase() }}",
+            "intencion": "={{ $json.Intencion }}",
+            "confianza": "={{ $json.Confianza }}",
+            "palabras_clave": "={{ $json.Palabras_Clave.trim().split(', ') }}",
+            "respuesta_sugerida": "={{ $json.Respuesta_Sugerida }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "nombre_cliente",
+              "displayName": "nombre_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email_cliente",
+              "displayName": "email_cliente",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "mensaje_original",
+              "displayName": "mensaje_original",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sentimiento",
+              "displayName": "sentimiento",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Positivo",
+                  "value": "Positivo"
+                },
+                {
+                  "name": "Neutral",
+                  "value": "Neutral"
+                },
+                {
+                  "name": "Negativo",
+                  "value": "Negativo"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "intencion",
+              "displayName": "intencion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "confianza",
+              "displayName": "confianza",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "palabras_clave",
+              "displayName": "palabras_clave",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "options": [
+                {
+                  "name": "clase",
+                  "value": "clase"
+                },
+                {
+                  "name": "excelente",
+                  "value": "excelente"
+                },
+                {
+                  "name": "material",
+                  "value": "material"
+                },
+                {
+                  "name": "lectura",
+                  "value": "lectura"
+                },
+                {
+                  "name": "error",
+                  "value": "error"
+                },
+                {
+                  "name": "zoom",
+                  "value": "zoom"
+                },
+                {
+                  "name": "clave",
+                  "value": "clave"
+                },
+                {
+                  "name": "inscripción",
+                  "value": "inscripción"
+                },
+                {
+                  "name": "cupos",
+                  "value": "cupos"
+                },
+                {
+                  "name": "conexión",
+                  "value": "conexión"
+                },
+                {
+                  "name": "corte",
+                  "value": "corte"
+                },
+                {
+                  "name": "gracias",
+                  "value": "gracias"
+                },
+                {
+                  "name": "paciencia",
+                  "value": "paciencia"
+                },
+                {
+                  "name": "descuento",
+                  "value": "descuento"
+                },
+                {
+                  "name": "pago",
+                  "value": "pago"
+                },
+                {
+                  "name": "recording",
+                  "value": "recording"
+                },
+                {
+                  "name": "session",
+                  "value": "session"
+                },
+                {
+                  "name": "dudas",
+                  "value": "dudas"
+                },
+                {
+                  "name": "instructor",
+                  "value": "instructor"
+                },
+                {
+                  "name": "ejemplos",
+                  "value": "ejemplos"
+                },
+                {
+                  "name": "práctica",
+                  "value": "práctica"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "respuesta_sugerida",
+              "displayName": "respuesta_sugerida",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8675300e-b629-48de-a930-51e834c089ed",
+      "name": "Registro en Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        672
+      ],
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "WYLEzPYtkTUfThe5",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "Fecha_Error",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "Mensaje_Error",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "Cliente_Nombre",
+              "value": "={{ $json.body.data.fields[0].value }}",
+              "type": "string"
+            },
+            {
+              "id": "id-6",
+              "name": "Cliente_Email",
+              "value": "={{ $json.body.data.fields[2].value }}",
+              "type": "string"
+            },
+            {
+              "id": "id-7",
+              "name": "Mensaje_Original",
+              "value": "={{ $json.body.data.fields[4].value }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2230578a-0780-4403-8d20-2fb46d940a37",
+      "name": "Preparar Log de Error",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1R9_0zgqGPQi7t0yGBtM-lsTRP9jE6j0970qIELr-Rco",
+          "mode": "list",
+          "cachedResultName": "MasterClass - n8n - Introducción",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R9_0zgqGPQi7t0yGBtM-lsTRP9jE6j0970qIELr-Rco/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1547818731,
+          "mode": "list",
+          "cachedResultName": "Errors",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R9_0zgqGPQi7t0yGBtM-lsTRP9jE6j0970qIELr-Rco/edit#gid=1547818731"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha_Error": "={{ $json.Fecha_Error }}",
+            "Mensaje_Error": "={{ $json.Mensaje_Error }}",
+            "Cliente_Nombre": "={{ $json.Cliente_Nombre }}",
+            "Cliente_Email": "={{ $json.Cliente_Email }}",
+            "Mensaje_Original": "={{ $json.Mensaje_Original }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha_Error",
+              "displayName": "Fecha_Error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mensaje_Error",
+              "displayName": "Mensaje_Error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cliente_Nombre",
+              "displayName": "Cliente_Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Cliente_Email",
+              "displayName": "Cliente_Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mensaje_Original",
+              "displayName": "Mensaje_Original",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "3a2103be-09ae-4d73-967d-33cdd21a5985",
+      "name": "Registro de Errores",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1136,
+        864
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0CExkrSJJRrhdAF7",
+          "name": "Sheets gobeamariano@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AJG4SGU5C",
+          "mode": "id"
+        },
+        "text": "=🚨 *ERROR EN ANÁLISIS DE SENTIMIENTO*\n\n*Tipo:* {{ $json.Mensaje_Error }}\n\n*Cliente Afectado:*\n- Nombre: {{ $json.Cliente_Nombre }}\n- Email: {{ $json.Cliente_Email }}\n\n*Mensaje Original:*\n{{ $json.Mensaje_Original }}\n\n*Fecha:* {{ $json.Fecha_Error }}\n\n_El error ha sido registrado en Google Sheets para auditoría._",
+        "otherOptions": {}
+      },
+      "id": "17846c3a-d2d2-4850-862b-6acb5a012a19",
+      "name": "Alerta de Error Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        1136,
+        1056
+      ],
+      "webhookId": "92e380ca-ef69-4877-b2f4-0c47601ef012",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "o26gZ4Sx9UhiiEVT",
+          "name": "Slack Henry Dummy"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "automatizar-sentimientos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        672
+      ],
+      "id": "b5c64a6d-86b5-4e09-9368-c595ad9a721a",
+      "name": "Webhook",
+      "webhookId": "1e5dcc4d-0216-4e7f-bfad-0e60d5c7c690"
+    },
+    {
+      "parameters": {
+        "model": "z-ai/glm-4.6",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        416,
+        896
+      ],
+      "id": "61979fe3-560a-4fcd-8d70-bb257041750e",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "xZpAyjDIWgQms8rD",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "z-ai/glm-4.5-air:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        624,
+        1104
+      ],
+      "id": "27246e9c-89e7-450d-8499-70708d2ecf68",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "xZpAyjDIWgQms8rD",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Análisis de Sentimiento IA": {
+      "main": [
+        [
+          {
+            "node": "Preparar Datos para Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Preparar Datos para Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preparar Log de Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructura JSON Sentimiento": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "Preparar Datos para Slack": {
+      "main": [
+        [
+          {
+            "node": "Notificación Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Datos para Airtable": {
+      "main": [
+        [
+          {
+            "node": "Registro en Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Log de Error": {
+      "main": [
+        [
+          {
+            "node": "Registro de Errores",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Alerta de Error Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Análisis de Sentimiento IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Análisis de Sentimiento IA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Estructura JSON Sentimiento",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "db8d09bbe9f4d9927fc4c8a17afea05396ceeae3fa505bb8a1751699adf525b5"
+  }
+}
+
+```
+
